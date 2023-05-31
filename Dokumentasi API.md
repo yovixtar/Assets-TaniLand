@@ -32,6 +32,11 @@
 
 # Dokumentasi API
 
+```txt
+Catatan : untuk semua Select / Get pastikan memberikan kondisi Where deleted_at = null
+```
+
+
 ## Base URL
 ```
 https://base_url.com/api/v1/
@@ -619,7 +624,7 @@ Body:
 
 ---
 
-## Delete Lahan (Field)
+## Delete Lahan
 
 ### Endpoint
 ```
@@ -627,18 +632,21 @@ DELETE /lahan/{id}
 ```
 
 ### Deskripsi
-API ini digunakan untuk menghapus lahan pengguna. Pengguna harus menyertakan token JWT dalam header dan ID lahan dalam URL untuk mengakses API ini.
+API ini digunakan untuk menghapus lahan milik pengguna. Pengguna harus menyertakan token JWT dalam header untuk mengakses API ini. Menghapus lahan hanya akan mengubah nilai `deleted_at` di database.
 
 ### Headers
 - Content-Type: application/json
 - Authorization: {token}
 
+### Parameters
+- id: String (ID dari lahan yang akan dihapus)
+
 ### Logic
-1. API menerima request dengan token JWT pada header `Authorization` dan ID lahan pada URL.
+1. API menerima request dengan token JWT pada header `Authorization` dan ID lahan pada path.
 2. API akan memvalidasi token tersebut.
     - Jika token tidak valid atau sudah expired, maka API akan mengembalikan response error.
-    - Jika token valid, API akan mencari lahan dengan ID tersebut di database.
-        - Jika lahan ditemukan, API akan menghapus lahan tersebut dan mengembalikan response sukses.
+    - Jika token valid, API akan mencari lahan dengan ID yang sesuai di database.
+        - Jika lahan ditemukan, API akan mengubah nilai `deleted_at` lahan tersebut dan mengembalikan response sukses.
         - Jika lahan tidak ditemukan, API akan mengembalikan response error.
 
 ### Response
@@ -657,7 +665,10 @@ Headers:
 - Content-Type: application/json
 - Authorization: xyz987
 
-URL: https://base_url.com/api/v1/lahan/abcd1234
+Endpoint:
+```
+DELETE /lahan/lahan1
+```
 
 #### Response (Success)
 ```json
