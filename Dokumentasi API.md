@@ -1,3 +1,35 @@
+### Tabel Pengguna (Users)
+
+| Kolom       | Tipe Data  | Keterangan                         |
+|-------------|------------|------------------------------------|
+| id          | String     | Primary Key, ID dari pengguna      |
+| username    | String     | Nama pengguna                      |
+| email       | String     | Email pengguna                     |
+| photo       | String     | URL foto profil pengguna           |
+| premium     | Boolean    | Status premium pengguna            |
+| token       | String     | Token autentikasi pengguna         |
+| lasted_login| DateTime   | Waktu login terakhir pengguna      |
+| created_at  | DateTime   | Waktu pembuatan akun pengguna      |
+| updated_at  | DateTime   | Waktu update terakhir data pengguna|
+
+### Tabel Lahan (Lahan)
+
+| Kolom       | Tipe Data  | Keterangan                          |
+|-------------|------------|-------------------------------------|
+| id          | String     | Primary Key, ID dari lahan          |
+| user_id     | String     | Foreign Key, ID pengguna pemilik lahan |
+| nama        | String     | Nama lahan                          |
+| image       | String     | URL gambar lahan                    |
+| luas        | Double     | Luas lahan (dalam meter persegi)    |
+| alamat      | String     | Alamat lahan                        |
+| lat         | Double     | Latitude lahan (optional)           |
+| lon         | Double     | Longitude lahan (optional)          |
+| created_at  | DateTime   | Waktu pembuatan data lahan          |
+| updated_at  | DateTime   | Waktu update terakhir data lahan    |
+| deleted_at  | DateTime   | Waktu penghapusan data lahan (optional)|
+
+
+
 # Dokumentasi API
 
 ## Base URL
