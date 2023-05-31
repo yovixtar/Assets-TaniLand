@@ -311,18 +311,18 @@ GET /home/lahan
 ```
 
 ### Deskripsi
-API ini digunakan untuk mendapatkan maksimal 5 data lahan yang dimiliki oleh pengguna. Pengguna harus menyertakan token JWT dalam header untuk mengakses API ini. Image lahan akan diambil secara acak dari data dummy assets image default lahan.
+API ini digunakan untuk mendapatkan data lahan yang dimiliki pengguna. Pengguna harus menyertakan token JWT dalam header untuk mengakses API ini. API ini akan mengembalikan maksimum 5 data lahan.
 
 ### Headers
 - Content-Type: application/json
-- Token: {token}
+- Authorization: {token}
 
 ### Logic
-1. API menerima request dengan token JWT pada header `Token`.
+1. API menerima request dengan token JWT pada header `Authorization`.
 2. API akan memvalidasi token tersebut.
     - Jika token tidak valid atau sudah expired, maka API akan mengembalikan response error.
-    - Jika token valid, API akan mencari data user yang berhubungan dengan token tersebut di database dan mencari maksimal 5 lahan yang dimiliki oleh user tersebut.
-        - Jika data lahan ditemukan, API akan mengembalikan response berisi data lahan tersebut.
+    - Jika token valid, API akan mencari data lahan yang berhubungan dengan token tersebut di database.
+        - Jika data lahan ditemukan, API akan mengembalikan response berisi data lahan (maksimum 5 data).
         - Jika data lahan tidak ditemukan, API akan mengembalikan response error.
 
 ### Response
@@ -337,9 +337,11 @@ API akan mengembalikan respon dengan format berikut:
       "nama": "string",
       "image": "string",
       "luas": "double",
-      "alamat": "string"
+      "alamat": "string",
+      "lat": "double",
+      "lon": "double"
     },
-    ...
+    // ... maximum 5 lahan
   ]
 }
 ```
@@ -349,7 +351,7 @@ API akan mengembalikan respon dengan format berikut:
 #### Request
 Headers:
 - Content-Type: application/json
-- Token: xyz987
+- Authorization: xyz987
 
 #### Response (Success)
 ```json
@@ -359,19 +361,23 @@ Headers:
   "data": [
     {
       "id": "lahan1",
-      "nama": "Lahan Pertama",
-      "image": "https://example.com/default_lahan_image.jpg",
-      "luas": 100.0,
-      "alamat": "Jl. Lahan Pertama No.1"
+      "nama": "Lahan 1",
+      "image": "https://example.com/lahan1.jpg",
+      "luas": 10.5,
+      "alamat": "Jl. Lahan 1, Bandung",
+      "lat": -6.917464,
+      "lon": 107.619123
     },
     {
       "id": "lahan2",
-      "nama": "Lahan Kedua",
-      "image": "https://example.com/default_lahan_image2.jpg",
-      "luas": 200.0,
-      "alamat": "Jl. Lahan Kedua No.2"
+      "nama": "Lahan 2",
+      "image": "https://example.com/lahan2.jpg",
+      "luas": 20.0,
+      "alamat": "Jl. Lahan 2, Jakarta",
+      "lat": -6.200000,
+      "lon": 106.816666
     },
-    ...
+    // ... up to 5 lahan
   ]
 }
 ```
@@ -394,7 +400,7 @@ Headers:
 }
 ```
 
-#### Response (Lahan Not Found)
+#### Response (No Lahan Found)
 ```json
 {
   "error": true,
@@ -415,18 +421,18 @@ GET /lahan
 ```
 
 ### Deskripsi
-API ini digunakan untuk mendapatkan semua data lahan yang dimiliki oleh pengguna. Pengguna harus menyertakan token JWT dalam header untuk mengakses API ini. Image lahan akan diambil secara acak dari data dummy assets image default lahan.
+API ini digunakan untuk mendapatkan semua data lahan yang dimiliki oleh pengguna. Pengguna harus menyertakan token JWT dalam header untuk mengakses API ini.
 
 ### Headers
 - Content-Type: application/json
-- Token: {token}
+- Authorization: {token}
 
 ### Logic
-1. API menerima request dengan token JWT pada header `Token`.
+1. API menerima request dengan token JWT pada header `Authorization`.
 2. API akan memvalidasi token tersebut.
     - Jika token tidak valid atau sudah expired, maka API akan mengembalikan response error.
-    - Jika token valid, API akan mencari data user yang berhubungan dengan token tersebut di database dan mencari semua lahan yang dimiliki oleh user tersebut.
-        - Jika data lahan ditemukan, API akan mengembalikan response berisi data lahan tersebut.
+    - Jika token valid, API akan mencari semua data lahan yang berhubungan dengan token tersebut di database.
+        - Jika data lahan ditemukan, API akan mengembalikan response berisi semua data lahan.
         - Jika data lahan tidak ditemukan, API akan mengembalikan response error.
 
 ### Response
@@ -441,9 +447,11 @@ API akan mengembalikan respon dengan format berikut:
       "nama": "string",
       "image": "string",
       "luas": "double",
-      "alamat": "string"
+      "alamat": "string",
+      "lat": "double",
+      "lon": "double"
     },
-    ...
+    // ... all lahan
   ]
 }
 ```
@@ -453,29 +461,33 @@ API akan mengembalikan respon dengan format berikut:
 #### Request
 Headers:
 - Content-Type: application/json
-- Token: xyz987
+- Authorization: xyz987
 
 #### Response (Success)
 ```json
 {
   "error": false,
-  "message": "Lahan data fetched successfully",
+  "message": "All lahan data fetched successfully",
   "data": [
     {
       "id": "lahan1",
-      "nama": "Lahan Pertama",
-      "image": "https://example.com/default_lahan_image.jpg",
-      "luas": 100.0,
-      "alamat": "Jl. Lahan Pertama No.1"
+      "nama": "Lahan 1",
+      "image": "https://example.com/lahan1.jpg",
+      "luas": 10.5,
+      "alamat": "Jl. Lahan 1, Bandung",
+      "lat": -6.917464,
+      "lon": 107.619123
     },
     {
       "id": "lahan2",
-      "nama": "Lahan Kedua",
-      "image": "https://example.com/default_lahan_image2.jpg",
-      "luas": 200.0,
-      "alamat": "Jl. Lahan Kedua No.2"
+      "nama": "Lahan 2",
+      "image": "https://example.com/lahan2.jpg",
+      "luas": 20.0,
+      "alamat": "Jl. Lahan 2, Jakarta",
+      "lat": -6.200000,
+      "lon": 106.816666
     },
-    ...
+    // ... all lahan
   ]
 }
 ```
@@ -498,7 +510,7 @@ Headers:
 }
 ```
 
-#### Response (Lahan Not Found)
+#### Response (No Lahan Found)
 ```json
 {
   "error": true,
@@ -511,7 +523,7 @@ Headers:
 
 ---
 
-## Tambah Lahan
+## Add Lahan
 
 ### Endpoint
 ```
@@ -519,40 +531,37 @@ POST /lahan
 ```
 
 ### Deskripsi
-API ini digunakan untuk menambah data lahan baru yang dimiliki oleh pengguna. Pengguna harus menyertakan token JWT dalam header untuk mengakses API ini. Image lahan akan diambil secara acak dari data dummy assets image default lahan.
+API ini digunakan untuk menambahkan lahan baru milik pengguna. Pengguna harus menyertakan token JWT dalam header untuk mengakses API ini.
 
 ### Headers
 - Content-Type: application/json
-- Token: {token}
+- Authorization: {token}
 
 ### Request Body
 ```json
 {
   "nama": "string",
   "luas": "double",
-  "alamat": "string"
+  "alamat": "string",
+  "lat": "double",
+  "lon": "double"
 }
 ```
 
 ### Logic
-1. API menerima request dengan token JWT pada header `Token` dan data nama, luas, dan alamat lahan baru pada body.
+1. API menerima request dengan token JWT pada header `Authorization` dan data lahan pada body request.
 2. API akan memvalidasi token tersebut.
     - Jika token tidak valid atau sudah expired, maka API akan mengembalikan response error.
-    - Jika token valid, API akan menambahkan lahan baru dengan data yang diberikan dan image acak dari data dummy ke database, kemudian mengembalikan response sukses.
+    - Jika token valid, API akan menambahkan data lahan baru ke database dengan data dari request body dan gambar acak dari data dummy.
+        - Jika proses berhasil, API akan mengembalikan response sukses.
+        - Jika proses gagal, API akan mengembalikan response error.
 
 ### Response
 API akan mengembalikan respon dengan format berikut:
 ```json
 {
   "error": "boolean",
-  "message": "string",
-  "data": {
-    "id": "string",
-    "nama": "string",
-    "image": "string",
-    "luas": "double",
-    "alamat": "string"
-  }
+  "message": "string"
 }
 ```
 
@@ -561,14 +570,16 @@ API akan mengembalikan respon dengan format berikut:
 #### Request
 Headers:
 - Content-Type: application/json
-- Token: xyz987
+- Authorization: xyz987
 
 Body:
 ```json
 {
-  "nama": "Lahan Baru",
-  "luas": 150.0,
-  "alamat": "Jl. Lahan Baru No.3"
+  "nama": "Lahan 3",
+  "luas": 15.0,
+  "alamat": "Jl. Lahan 3, Surabaya",
+  "lat": -7.250445,
+  "lon": 112.768845
 }
 ```
 
@@ -576,14 +587,7 @@ Body:
 ```json
 {
   "error": false,
-  "message": "Lahan successfully added",
-  "data": {
-    "id": "lahan3",
-    "nama": "Lahan Baru",
-    "image": "https://example.com/default_lahan_image3.jpg",
-    "luas": 150.0,
-    "alamat": "Jl. Lahan Baru No.3"
-  }
+  "message": "Lahan added successfully"
 }
 ```
 
@@ -591,8 +595,7 @@ Body:
 ```json
 {
   "error": true,
-  "message": "Invalid token",
-  "data": null
+  "message": "Invalid token"
 }
 ```
 
@@ -600,8 +603,15 @@ Body:
 ```json
 {
   "error": true,
-  "message": "Token expired",
-  "data": null
+  "message": "Token expired"
+}
+```
+
+#### Response (Failure in Adding Lahan)
+```json
+{
+  "error": true,
+  "message": "Failed to add lahan"
 }
 ```
 
@@ -609,7 +619,7 @@ Body:
 
 ---
 
-## Hapus Lahan
+## Delete Lahan (Field)
 
 ### Endpoint
 ```
@@ -617,20 +627,17 @@ DELETE /lahan/{id}
 ```
 
 ### Deskripsi
-API ini digunakan untuk menghapus data lahan yang dimiliki oleh pengguna. Pengguna harus menyertakan token JWT dalam header untuk mengakses API ini.
+API ini digunakan untuk menghapus lahan pengguna. Pengguna harus menyertakan token JWT dalam header dan ID lahan dalam URL untuk mengakses API ini.
 
 ### Headers
 - Content-Type: application/json
-- Token: {token}
-
-### Parameters
-- id (string): ID dari lahan yang ingin dihapus.
+- Authorization: {token}
 
 ### Logic
-1. API menerima request dengan token JWT pada header `Token` dan ID lahan pada path parameter.
+1. API menerima request dengan token JWT pada header `Authorization` dan ID lahan pada URL.
 2. API akan memvalidasi token tersebut.
     - Jika token tidak valid atau sudah expired, maka API akan mengembalikan response error.
-    - Jika token valid, API akan mencari lahan dengan ID yang diberikan.
+    - Jika token valid, API akan mencari lahan dengan ID tersebut di database.
         - Jika lahan ditemukan, API akan menghapus lahan tersebut dan mengembalikan response sukses.
         - Jika lahan tidak ditemukan, API akan mengembalikan response error.
 
@@ -648,18 +655,15 @@ API akan mengembalikan respon dengan format berikut:
 #### Request
 Headers:
 - Content-Type: application/json
-- Token: xyz987
+- Authorization: xyz987
 
-Endpoint:
-```
-DELETE /lahan/lahan3
-```
+URL: https://base_url.com/api/v1/lahan/abcd1234
 
 #### Response (Success)
 ```json
 {
   "error": false,
-  "message": "Lahan successfully deleted"
+  "message": "Lahan deleted successfully"
 }
 ```
 
