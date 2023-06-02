@@ -330,13 +330,6 @@ API ini digunakan untuk mendapatkan data lahan yang dimiliki pengguna. Pengguna 
         - Jika data lahan ditemukan, API akan mengembalikan response berisi data lahan (maksimum 5 data).
         - Jika data lahan tidak ditemukan, API akan mengembalikan response error.
 
-#### Request
-```json
-{
-  "userid": "xyz987"
-}
-```
-
 ### Response
 API akan mengembalikan respon dengan format berikut:
 ```json
@@ -359,17 +352,6 @@ API akan mengembalikan respon dengan format berikut:
 ```
 
 ### Contoh Request dan Response
-
-#### Request
-Headers:
-- Content-Type: application/json
-- Authorization: xyz987
-
-```json
-{
-  "userid": "xyz987"
-}
-```
 
 #### Response (Success)
 ```json
@@ -452,13 +434,6 @@ API ini digunakan untuk mendapatkan semua data lahan yang dimiliki oleh pengguna
     - Jika token valid, API akan mencari semua data lahan yang berhubungan dengan token tersebut di database.
         - Jika data lahan ditemukan, API akan mengembalikan response berisi semua data lahan.
         - Jika data lahan tidak ditemukan, API akan mengembalikan response error.
-
-#### Request
-```json
-{
-  "userid": "xyz987"
-}
-```
 
 ### Response
 API akan mengembalikan respon dengan format berikut:
@@ -722,3 +697,6 @@ DELETE /lahan/lahan1
   "message": "Lahan not found"
 }
 ```
+
+
+
