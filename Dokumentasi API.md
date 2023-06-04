@@ -494,7 +494,7 @@ Headers:
 Body:
 ```json
 {
-  "userid": "xyz987",
+  "user_id": "xyz987",
   "nama": "Lahan 3",
   "luas": 15.0,
   "alamat": "Jl. Lahan 3, Surabaya",
