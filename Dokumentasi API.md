@@ -689,7 +689,7 @@ API ini digunakan untuk mendapatkan detail lahan pengguna termasuk data tanam, b
     - Jika token tidak valid atau sudah expired, maka API akan mengembalikan response error.
     - Jika token valid, API akan mencari lahan dengan ID yang sesuai di database.
         - Jika lahan ditemukan, API akan mencari data tanam, bibit, dan aktivitas yang berkaitan dengan lahan tersebut.
-            - Jika data tanam ditemukan, API akan menghitung umur tanam dan menambahkannya ke response.
+            - Jika data tanam ditemukan, API akan menghitung umur tanam (jika tanggal_panen null maka hasil perhitungan selisih hari ini dengan tanggal_tanam, jika tanggal_panen tidak null maka hasil dari selisih tanggal_tanam dan tanggal_panen (bukan negatif)) dan menambahkannya ke response.
             - Jika data bibit ditemukan, API akan menambahkannya ke response.
             - Jika data aktivitas ditemukan, API akan menambahkannya ke response.
             - Jika data tanam, bibit, atau aktivitas tidak ditemukan, API akan mengembalikan response dengan data kosong pada bagian tersebut.
