@@ -619,3 +619,208 @@ DELETE /lahan/lahan1
 
 
 
+TANAM:
+| Field           | Type Data    | Keterangan                              |
+|-----------------|--------------|-----------------------------------------|
+| id              | String       | Primary Key                             |
+| bibit_id        | String       | Foreign Key dari tabel Bibit             |
+| lahan_id        | String       | Foreign Key dari tabel Lahan             |
+| jarak           | Integer      | Default 30                              |
+| status          | Enum         | Nilai yang dapat dipilih: plan, exec, close |
+| tanggal_tanam   | Date         |                                         |
+| tanggal_panen   | Date         | Null                                    |
+| jumlah_panen    | Integer      | Null                                    |
+| harga_panen     | Integer      | Null                                    |
+| created_at      | Timestamp    |                                         |
+| updated_at      | Timestamp    |                                         |
+| deleted_at      | Timestamp    |                                         |
+
+BIBIT:
+| Field           | Type Data    | Keterangan                              |
+|-----------------|--------------|-----------------------------------------|
+| id              | String       | Primary Key                             |
+| nama            | String       |                                         |
+| photo           | String       |                                         |
+| deskripsi       | Text         |                                         |
+| harga_beli      | Integer      |                                         |
+| jenis           | Enum         | Nilai yang dapat dipilih: Sayuran / Buah |
+| link_market     | String       | Default tani.iyabos.com/marketplace      |
+| created_at      | Timestamp    |                                         |
+| updated_at      | Timestamp    |                                         |
+| deleted_at      | Timestamp    |                                         |
+
+AKTIVITAS:
+| Field           | Type Data    | Keterangan                              |
+|-----------------|--------------|-----------------------------------------|
+| id              | String       | Primary Key                             |
+| tanam_id        | String       | Foreign Key dari tabel Tanam             |
+| nama            | String       |                                         |
+| keterangan      | Text         |                                         |
+| pupuk           | Integer      | null                                    |
+| tanggal_aktifitas| Date         |                                         |
+| created_at      | Timestamp    |                                         |
+| updated_at      | Timestamp    |                                         |
+| deleted_at      | Timestamp    |                                         |
+
+
+
+---
+
+## Get Detail Lahan
+
+### Endpoint
+```
+GET /lahan/{id}
+```
+
+### Deskripsi
+API ini digunakan untuk mendapatkan detail lahan pengguna termasuk data tanam, bibit, dan aktivitas. Pengguna harus menyertakan token JWT dalam header untuk mengakses API ini.
+
+### Headers
+- Content-Type: application/json
+- Authorization: {token}
+
+### Parameters
+- id: String (ID dari lahan)
+
+### Logic
+1. API menerima request dengan token JWT pada header `Authorization` dan ID lahan pada path.
+2. API akan memvalidasi token tersebut.
+    - Jika token tidak valid atau sudah expired, maka API akan mengembalikan response error.
+    - Jika token valid, API akan mencari lahan dengan ID yang sesuai di database.
+        - Jika lahan ditemukan, API akan mencari data tanam, bibit, dan aktivitas yang berkaitan dengan lahan tersebut.
+            - Jika data tanam ditemukan, API akan menghitung umur tanam dan menambahkannya ke response.
+            - Jika data bibit ditemukan, API akan menambahkannya ke response.
+            - Jika data aktivitas ditemukan, API akan menambahkannya ke response.
+            - Jika data tanam, bibit, atau aktivitas tidak ditemukan, API akan mengembalikan response dengan data kosong pada bagian tersebut.
+        - Jika lahan tidak ditemukan, API akan mengembalikan response error.
+
+### Response
+API akan mengembalikan respon dengan format berikut:
+```json
+{
+  "error": "boolean",
+  "message": "string",
+  "data": {
+    "id": "string",
+    "nama": "string",
+    "image": "string",
+    "luas": "double",
+    "alamat": "string",
+    "lat": "double",
+    "lon": "double",
+    "tanam": {
+      "id": "string",
+      "jarak": "integer",
+      "status": "enum",
+      "tanggal_tanam": "date",
+      "tanggal_panen": "date",
+      "jumlah_panen": "integer",
+      "harga_panen": "integer",
+      "umur": "integer",
+      "bibit": {
+        "id": "string",
+        "nama": "string",
+        "photo": "string",
+        "deskripsi": "text",
+        "harga_beli": "integer",
+        "jenis": "enum",
+        "link_market": "string"
+      },
+      "aktivitas": [
+        {
+          "id": "string",
+          "nama": "string",
+          "keterangan": "text",
+          "pupuk": "integer",
+          "tanggal_aktifitas": "date"
+        },
+        // ... max 5 aktivitas
+      ]
+    }
+  }
+}
+```
+
+### Contoh Request dan Response
+
+#### Request
+Headers:
+- Content-Type: application/json
+- Authorization: xyz987
+
+Endpoint:
+```
+GET /lahan/lahan1
+```
+
+#### Response (Success)
+```json
+{
+  "error": false,
+  "message": "Detail lahan fetched successfully",
+  "data": {
+    "id": "lahan1",
+    "nama": "Lahan 1",
+    "image": "https://example.com/lahan1.jpg",
+    "luas": 10.5,
+    "alamat": "Jl. Lahan 1, Bandung",
+    "lat": -6.917464
+
+,
+    "lon": 107.619123,
+    "tanam": {
+      "id": "tanam1",
+      "jarak": 30,
+      "status": "plan",
+      "tanggal_tanam": "2023-06-04",
+      "tanggal_panen": null,
+      "jumlah_panen": null,
+      "harga_panen": null,
+      "umur": 0,
+      "bibit": {
+        "id": "bibit1",
+        "nama": "Bibit Tomat",
+        "photo": "https://example.com/bibit1.jpg",
+        "deskripsi": "Bibit tomat unggul",
+        "harga_beli": 10000,
+        "jenis": "Sayuran",
+        "link_market": "https://tani.iyabos.com/marketplace"
+      },
+      "aktivitas": [
+        {
+          "id": "aktivitas1",
+          "nama": "Pemupukan",
+          "keterangan": "Pemupukan tahap 1",
+          "pupuk": 1,
+          "tanggal_aktifitas": "2023-06-04"
+        }
+      ]
+    }
+  }
+}
+```
+
+#### Response (Token Invalid)
+```json
+{
+  "error": true,
+  "message": "Invalid token"
+}
+```
+
+#### Response (Token Expired)
+```json
+{
+  "error": true,
+  "message": "Token expired"
+}
+```
+
+#### Response (Lahan Not Found)
+```json
+{
+  "error": true,
+  "message": "Lahan not found"
+}
+```
