@@ -627,7 +627,7 @@ TANAM:
 | lahan_id        | String       | Foreign Key dari tabel Lahan             |
 | jarak           | Integer      | Default 30                              |
 | status          | Enum         | Nilai yang dapat dipilih: plan, exec, close |
-| tanggal_tanam   | Date         |                                         |
+| tanggal_tanam   | Date         | Null                                    |
 | tanggal_panen   | Date         | Null                                    |
 | jumlah_panen    | Integer      | Null                                    |
 | harga_panen     | Integer      | Null                                    |
@@ -824,3 +824,382 @@ GET /lahan/lahan1
   "message": "Lahan not found"
 }
 ```
+
+
+
+---
+
+## Get Semua Bibit
+
+### Endpoint
+```
+GET /bibit
+```
+
+### Deskripsi
+API ini digunakan untuk mendapatkan semua data bibit yang tersedia. Pengguna harus menyertakan token JWT dalam header untuk mengakses API ini. Token di header harus dimulai dengan kata "Bearer".
+
+### Headers
+- Content-Type: application/json
+- Authorization: Bearer {token}
+
+### Logic
+1. API menerima request dengan token JWT pada header `Authorization`. Token harus diawali dengan kata "Bearer".
+2. API akan memvalidasi token tersebut.
+    - Jika token tidak valid atau sudah expired, maka API akan mengembalikan response error.
+    - Jika token valid, API akan mengambil semua data bibit dari database dan mengembalikan response sukses berupa data bibit.
+
+### Response
+API akan mengembalikan respon dengan format berikut:
+```json
+{
+  "error": "boolean",
+  "message": "string",
+  "data": [
+    {
+      "id": "string",
+      "nama": "string",
+      "photo": "string",
+      "deskripsi": "text",
+      "harga_beli": "integer",
+      "jenis": "enum",
+      "link_market": "string"
+    },
+    // ... semua data bibit
+  ]
+}
+```
+
+### Contoh Request dan Response
+
+#### Request
+Headers:
+- Content-Type: application/json
+- Authorization: Bearer xyz987
+
+Endpoint:
+```
+GET /bibit
+```
+
+#### Response (Success)
+```json
+{
+  "error": false,
+  "message": "Data bibit fetched successfully",
+  "data": [
+    {
+      "id": "bibit1",
+      "nama": "Bibit Tomat",
+      "photo": "https://example.com/bibit1.jpg",
+      "deskripsi": "Bibit tomat unggul",
+      "harga_beli": 10000,
+      "jenis": "Sayuran",
+      "link_market": "https://tani.iyabos.com/marketplace"
+    },
+    // ... semua data bibit
+  ]
+}
+```
+
+#### Response (Token Invalid)
+```json
+{
+  "error": true,
+  "message": "Invalid token"
+}
+```
+
+#### Response (Token Expired)
+```json
+{
+  "error": true,
+  "message": "Token expired"
+}
+```
+
+
+
+### Tabel iot
+
+| Field     | Type   | Keterangan              |
+|-----------|--------|-------------------------|
+| id        | String | Primary Key             |
+| user_id   | String | Foreign Key, Nullable   |
+| lahan_id  | String | Foreign Key, Nullable   |
+| created_at| timestamp |                       |
+| updated_at| timestamp |                       |
+| deleted_at| timestamp |                       |
+
+### Tabel hasil_iot
+
+| Field            | Type       | Keterangan                 |
+|------------------|------------|----------------------------|
+| id               | String     | Primary Key                |
+| iot_id          | String     | Foreign Key                |
+| kelembaban_udara | Double     |                            |
+| suhu             | Double     |                            |
+| created_at       | timestamp  |                            |
+| updated_at       | timestamp  |                            |
+| deleted_at       | timestamp  |                            |
+
+### Base Data iot
+
+| id                | user_id  | created_at          | updated_at          | deleted_at          |
+|-------------------|----------|---------------------|---------------------|---------------------|
+| prototype-taniland|          | Waktu Sekarang      |                     |                     |
+
+
+
+---
+
+## Tambah Data Hasil IoT
+
+### Endpoint
+```
+GET /hasil-iot
+```
+
+### Deskripsi
+API ini digunakan oleh perangkat IoT untuk mengirim data pengukuran suhu dan kelembaban udara. Data tersebut akan ditambahkan ke database.
+
+### Parameters
+- suhu: Double (Data suhu dari perangkat IoT)
+- kelembaban_udara: Double (Data kelembaban udara dari perangkat IoT)
+- iot_id: String (ID dari perangkat IoT)
+
+### Logic
+1. API menerima request dengan parameter `suhu`, `kelembaban_udara`, dan `iot_id`.
+2. API akan memvalidasi data tersebut.
+    - Jika data tidak valid (contoh: `suhu` atau `kelembaban_udara` berada di luar rentang yang diterima, atau `iot_id` tidak ditemukan dalam database), API akan mengembalikan response error.
+    - Jika data valid, API akan menambahkan data tersebut ke database dan mengembalikan response sukses.
+
+### Response
+API akan mengembalikan respon dengan format berikut:
+```json
+{
+  "error": "boolean",
+  "message": "string"
+}
+```
+
+### Contoh Request dan Response
+
+#### Request
+Endpoint:
+```
+GET /hasil-iot?suhu=25.5&kelembaban_udara=60.0&iot_id=iot1
+```
+
+#### Response (Success)
+```json
+{
+  "error": false,
+  "message": "Data IoT berhasil ditambahkan"
+}
+```
+
+#### Response (Data Tidak Valid)
+```json
+{
+  "error": true,
+  "message": "Data tidak valid"
+}
+```
+
+#### Response (IoT ID Tidak Ditemukan)
+```json
+{
+  "error": true,
+  "message": "IoT ID tidak ditemukan"
+}
+```
+
+
+
+---
+
+## Tambah Data Tanam (Plan)
+
+### Endpoint
+```
+POST /tanam/plan
+```
+
+### Deskripsi
+API ini digunakan untuk menambah data rencana penanaman (plan) ke dalam database. Pengguna harus menyertakan token JWT dalam header untuk mengakses API ini. Token di header harus dimulai dengan kata "Bearer".
+
+### Headers
+- Content-Type: application/json
+- Authorization: Bearer {token}
+
+### Body
+- bibit_id: String (ID dari bibit yang akan ditanam)
+- lahan_id: String (ID dari lahan yang akan digunakan)
+
+### Logic
+1. API menerima request dengan body berisi `bibit_id` dan `lahan_id`, dan token JWT pada header `Authorization`. Token harus diawali dengan kata "Bearer".
+2. API akan memvalidasi data tersebut.
+    - Jika `bibit_id` atau `lahan_id` tidak ditemukan dalam database, atau jika `lahan_id` sudah memiliki data tanam dengan status "plan" atau "exec", API akan mengembalikan response error.
+    - Jika data valid, API akan menambahkan data tersebut ke database dengan status "plan", `jarak` default menjadi 30, dan semua field tanggal kecuali `created_at` menjadi null. Kemudian API mengembalikan response sukses.
+
+### Response
+API akan mengembalikan respon dengan format berikut:
+```json
+{
+  "error": "boolean",
+  "message": "string"
+}
+```
+
+### Contoh Request dan Response
+
+#### Request
+Headers:
+- Content-Type: application/json
+- Authorization: Bearer xyz987
+
+Body:
+```json
+{
+  "bibit_id": "bibit1",
+  "lahan_id": "lahan1"
+}
+```
+
+Endpoint:
+```
+POST /tanam/plan
+```
+
+#### Response (Success)
+```json
+{
+  "error": false,
+  "message": "Data plan tanam berhasil ditambahkan"
+}
+```
+
+#### Response (Bibit atau Lahan Tidak Ditemukan)
+```json
+{
+  "error": true,
+  "message": "Bibit atau lahan tidak ditemukan"
+}
+```
+
+#### Response (Lahan Sudah Mempunyai Rencana atau Proses Tanam)
+```json
+{
+  "error": true,
+  "message": "Lahan sudah mempunyai rencana atau proses tanam"
+}
+```
+
+#### Response (Token Invalid)
+```json
+{
+  "error": true,
+  "message": "Invalid token"
+}
+```
+
+#### Response (Token Expired)
+```json
+{
+  "error": true,
+  "message": "Token expired"
+}
+```
+
+
+
+---
+
+## Update Status Tanam (Exec)
+
+### Endpoint
+```
+POST /tanam/exec
+```
+
+### Deskripsi
+API ini digunakan untuk mengubah status penanaman dari "plan" menjadi "exec". Pengguna harus menyertakan token JWT dalam header untuk mengakses API ini. Token di header harus dimulai dengan kata "Bearer".
+
+### Headers
+- Content-Type: application/json
+- Authorization: Bearer {token}
+
+### Body
+- id: String (ID dari tanam yang akan diubah statusnya)
+- jarak: Integer (jarak penanaman)
+- tanggal_tanam: Date (tanggal penanaman)
+
+### Logic
+1. API menerima request dengan body berisi `id`, `jarak`, dan `tanggal_tanam`, dan token JWT pada header `Authorization`. Token harus diawali dengan kata "Bearer".
+2. API akan memvalidasi data tersebut.
+    - Jika `id` tidak ditemukan dalam database, atau jika status tanam bukan "plan", API akan mengembalikan response error.
+    - Jika data valid, API akan mengubah status tanam menjadi "exec", mengupdate `jarak` dan `tanggal_tanam` sesuai data yang diterima, dan mengembalikan response sukses.
+
+### Response
+API akan mengembalikan respon dengan format berikut:
+```json
+{
+  "error": "boolean",
+  "message": "string"
+}
+```
+
+### Contoh Request dan Response
+
+#### Request
+Headers:
+- Content-Type: application/json
+- Authorization: Bearer xyz987
+
+Body:
+```json
+{
+  "id": "tanam1",
+  "jarak": 30,
+  "tanggal_tanam": "2023-06-12"
+}
+```
+
+Endpoint:
+```
+POST /tanam/exec
+```
+
+#### Response (Success)
+```json
+{
+  "error": false,
+  "message": "Status tanam berhasil diubah menjadi 'exec'"
+}
+```
+
+#### Response (Tanam Tidak Ditemukan atau Status bukan Plan)
+```json
+{
+  "error": true,
+  "message": "Data tanam tidak ditemukan atau status bukan 'plan'"
+}
+```
+
+#### Response (Token Invalid)
+```json
+{
+  "error": true,
+  "message": "Invalid token"
+}
+```
+
+#### Response (Token Expired)
+```json
+{
+  "error": true,
+  "message": "Token expired"
+}
+```
+
