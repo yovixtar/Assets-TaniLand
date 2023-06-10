@@ -1203,3 +1203,283 @@ POST /tanam/exec
 }
 ```
 
+
+
+
+---
+
+## Update Status Tanam (Close)
+
+### Endpoint
+```
+POST /tanam/close
+```
+
+### Deskripsi
+API ini digunakan untuk mengubah status penanaman dari "exec" menjadi "close". Pengguna harus menyertakan token JWT dalam header untuk mengakses API ini. Token di header harus dimulai dengan kata "Bearer".
+
+### Headers
+- Content-Type: application/json
+- Authorization: Bearer {token}
+
+### Body
+- id: String (ID dari tanam yang akan diubah statusnya)
+- tanggal_panen: Date (tanggal panen)
+- jumlah_panen: Integer (jumlah panen)
+- harga_panen: Integer (harga panen)
+
+### Logic
+1. API menerima request dengan body berisi `id`, `tanggal_panen`, `jumlah_panen`, dan `harga_panen`, serta token JWT pada header `Authorization`. Token harus diawali dengan kata "Bearer".
+2. API akan memvalidasi data tersebut.
+    - Jika `id` tidak ditemukan dalam database, atau jika status tanam bukan "exec", API akan mengembalikan response error.
+    - Jika data valid, API akan mengubah status tanam menjadi "close", mengupdate `tanggal_panen`, `jumlah_panen`, dan `harga_panen` sesuai data yang diterima, dan mengembalikan response sukses.
+
+### Response
+API akan mengembalikan respon dengan format berikut:
+```json
+{
+  "error": "boolean",
+  "message": "string"
+}
+```
+
+### Contoh Request dan Response
+
+#### Request
+Headers:
+- Content-Type: application/json
+- Authorization: Bearer xyz987
+
+Body:
+```json
+{
+  "id": "tanam1",
+  "tanggal_panen": "2023-07-15",
+  "jumlah_panen": 500,
+  "harga_panen": 10000
+}
+```
+
+Endpoint:
+```
+POST /tanam/close
+```
+
+#### Response (Success)
+```json
+{
+  "error": false,
+  "message": "Status tanam berhasil diubah menjadi 'close'"
+}
+```
+
+#### Response (Tanam Tidak Ditemukan atau Status bukan Exec)
+```json
+{
+  "error": true,
+  "message": "Data tanam tidak ditemukan atau status bukan 'exec'"
+}
+```
+
+#### Response (Token Invalid)
+```json
+{
+  "error": true,
+  "message": "Invalid token"
+}
+```
+
+#### Response (Token Expired)
+```json
+{
+  "error": true,
+  "message": "Token expired"
+}
+```
+
+
+
+---
+
+## Ambil Data Tanam yang Sudah Dipanen (Close)
+
+### Endpoint
+```
+GET /tanam/close?lahan_id={lahan_id}
+```
+
+### Deskripsi
+API ini digunakan untuk mengambil data tanam yang sudah dipanen berdasarkan ID lahan. Pengguna harus menyertakan token JWT dalam header untuk mengakses API ini. Token di header harus dimulai dengan kata "Bearer".
+
+### Headers
+- Content-Type: application/json
+- Authorization: Bearer {token}
+
+### Parameters
+- lahan_id: String (ID dari lahan yang ingin dilihat data tanamnya)
+
+### Logic
+1. API menerima request dengan parameter `lahan_id` dan token JWT pada header `Authorization`. Token harus diawali dengan kata "Bearer".
+2. API akan memvalidasi data tersebut.
+    - Jika `lahan_id` tidak ditemukan dalam database, API akan mengembalikan response error.
+    - Jika data valid, API akan mencari semua data tanam yang memiliki status "close" dan berada pada lahan dengan ID yang dimaksud. Untuk setiap data tanam, API juga akan mengambil nama bibit yang digunakan dari tabel Bibit.
+    - API kemudian mengembalikan response berisi data tanam dan nama bibit yang dimaksud.
+
+### Response
+API akan mengembalikan respon dengan format berikut:
+```json
+{
+  "error": "boolean",
+  "message": "string",
+  "data": [
+    {
+      "id": "string",
+      "bibit_nama": "string",
+      "jarak": "integer",
+      "status": "string",
+      "tanggal_tanam": "date",
+      "tanggal_panen": "date",
+      "jumlah_panen": "integer",
+      "harga_panen": "integer"
+    }
+    // ... data tanam lainnya
+  ]
+}
+```
+
+### Contoh Request dan Response
+
+#### Request
+Headers:
+- Content-Type: application/json
+- Authorization: Bearer xyz987
+
+Endpoint:
+```
+GET /tanam/close?lahan_id=lahan1
+```
+
+#### Response (Success)
+```json
+{
+  "error": false,
+  "message": "Data tanam berhasil diambil",
+  "data": [
+    {
+      "id": "tanam1",
+      "bibit_nama": "bibit1",
+      "jarak": 30,
+      "status": "close",
+      "tanggal_tanam": "2023-06-12",
+      "tanggal_panen": "2023-07-15",
+      "jumlah_panen": 500,
+      "harga_panen": 10000
+    }
+    // ... data tanam lainnya
+  ]
+}
+```
+
+#### Response (Lahan Tidak Ditemukan)
+```json
+{
+  "error": true,
+  "message": "Lahan tidak ditemukan"
+}
+```
+
+#### Response (Token Invalid)
+```json
+{
+  "error": true,
+  "message": "Invalid token"
+}
+```
+
+#### Response (Token Expired)
+```json
+{
+  "error": true,
+  "message": "Token expired"
+}
+```
+
+
+
+---
+
+## Delete Data Tanam
+
+### Endpoint
+```
+DELETE /tanam/{id}
+```
+
+### Deskripsi
+API ini digunakan untuk menghapus data tanam berdasarkan ID tanam. Sebenarnya, ini tidak menghapus data secara fisik, tetapi mengisi nilai `deleted_at` dengan timestamp saat ini. Pengguna harus menyertakan token JWT dalam header untuk mengakses API ini. Token di header harus dimulai dengan kata "Bearer".
+
+### Headers
+- Content-Type: application/json
+- Authorization: Bearer {token}
+
+### URL Parameters
+- id: String (ID dari tanam yang ingin dihapus)
+
+### Logic
+1. API menerima request dengan `id` tanam pada URL dan token JWT pada header `Authorization`. Token harus diawali dengan kata "Bearer".
+2. API akan memvalidasi data tersebut.
+    - Jika `id` tidak ditemukan dalam database, atau jika `deleted_at` dari tanam sudah terisi, API akan mengembalikan response error.
+    - Jika data valid, API akan mengisi `deleted_at` dengan timestamp saat ini, dan mengembalikan response sukses.
+
+### Response
+API akan mengembalikan respon dengan format berikut:
+```json
+{
+  "error": "boolean",
+  "message": "string"
+}
+```
+
+### Contoh Request dan Response
+
+#### Request
+Headers:
+- Content-Type: application/json
+- Authorization: Bearer xyz987
+
+Endpoint:
+```
+DELETE /tanam/tanam1
+```
+
+#### Response (Success)
+```json
+{
+  "error": false,
+  "message": "Data tanam berhasil dihapus"
+}
+```
+
+#### Response (Tanam Tidak Ditemukan atau Sudah Dihapus)
+```json
+{
+  "error": true,
+  "message": "Data tanam tidak ditemukan atau sudah dihapus"
+}
+```
+
+#### Response (Token Invalid)
+```json
+{
+  "error": true,
+  "message": "Invalid token"
+}
+```
+
+#### Response (Token Expired)
+```json
+{
+  "error": true,
+  "message": "Token expired"
+}
+```
