@@ -945,9 +945,9 @@ GET /bibit
 
 ### Base Data iot
 
-| id                | user_id  | created_at          | updated_at          | deleted_at          |
-|-------------------|----------|---------------------|---------------------|---------------------|
-| prototype-taniland|          | Waktu Sekarang      |                     |                     |
+| id                | user_id  | lahan_id  | created_at          | updated_at          | deleted_at          |
+|-------------------|----------|-----------|---------------------|---------------------|---------------------|
+| prototype-taniland|          |           | Waktu Sekarang      |                     |                     |
 
 
 
@@ -1481,5 +1481,206 @@ DELETE /tanam/tanam1
 {
   "error": true,
   "message": "Token expired"
+}
+```
+
+
+---
+
+## Ambil Rata-Rata Hasil IOT Dalam 1 Minggu
+
+### Endpoint
+```
+GET /iot/{iot_id}
+```
+
+### Deskripsi
+API ini digunakan untuk mengambil rata-rata data hasil-iot berdasarkan `iot_id` dalam 1 minggu terakhir.
+
+### URL Parameters
+- iot_id: String (ID dari IOT)
+
+### Response
+API akan mengembalikan respon dengan format berikut:
+```json
+{
+  "error": "boolean",
+  "message": "string",
+  "data": {
+    "suhu": "double",
+    "kelembaban_udara": "double"
+  }
+}
+```
+
+### Contoh Request dan Response
+
+#### Request
+Endpoint:
+```
+GET /iot/iot123
+```
+
+#### Response (Success)
+```json
+{
+  "error": false,
+  "message": "Data berhasil didapat",
+  "data": {
+    "suhu": 25.5,
+    "kelembaban_udara": 60.5
+  }
+}
+```
+
+#### Response (Data Tidak Ditemukan)
+```json
+{
+  "error": true,
+  "message": "Data tidak ditemukan"
+}
+```
+
+---
+
+
+## Daftarkan IOT ke Lahan
+
+### Endpoint
+```
+POST /iot
+```
+
+### Deskripsi
+API ini digunakan untuk mendaftarkan IOT di sebuah Lahan.
+
+### Headers
+- Content-Type: application/json
+- Authorization: Bearer {token}
+
+### Body
+```json
+{
+  "iot_id": "string",
+  "lahan_id": "string"
+}
+```
+
+### Logic
+1. API akan memvalidasi data yang dikirimkan.
+    - Jika `iot_id` tidak ditemukan dalam database atau `lahan_id` tidak ditemukan dalam database, API akan mengembalikan response error.
+    - Jika `iot_id` sudah terdaftar (user_id dan lahan_id pada iot_id sudah terisi), API akan mengembalikan response error dan pesan bahwa IOT sudah terdaftar di lahan lain.
+    - Jika data valid, API akan mengupdate `user_id` dan `lahan_id` berdasarkan `iot_id`, dan mengembalikan response sukses.
+
+### Response
+API akan mengembalikan respon dengan format berikut:
+```json
+{
+  "error": "boolean",
+  "message": "string"
+}
+```
+
+### Contoh Request dan Response
+
+#### Request
+Headers:
+- Content-Type: application/json
+- Authorization: Bearer xyz987
+
+Body:
+```json
+{
+  "iot_id": "iot123",
+  "lahan_id": "lahan456"
+}
+```
+
+#### Response (Success)
+```json
+{
+  "error": false,
+  "message": "IOT berhasil didaftarkan di lahan"
+}
+```
+
+#### Response (IOT atau Lahan Tidak Ditemukan)
+```json
+{
+  "error": true,
+  "message": "IOT atau lahan tidak ditemukan"
+}
+```
+
+#### Response (IOT Sudah Terdaftar)
+```json
+{
+  "error": true,
+  "message": "IOT sudah terdaftar di lahan lain (nama lahan)"
+}
+```
+
+---
+
+## Reset Pendaftaran IOT
+
+### Endpoint
+```
+POST /iot/reset
+```
+
+### Deskripsi
+API ini digunakan untuk mereset pendaftaran IOT, yaitu mengosongkan `user_id` dan `lahan_id` berdasarkan `iot_id`.
+
+### Headers
+- Content-Type: application/json
+
+### Body
+```json
+{
+  "id": "string"
+}
+```
+
+### Logic
+1. API akan memvalidasi data yang dikirimkan.
+    - Jika `iot_id` tidak ditemukan dalam database, API akan mengembalikan response error.
+    - Jika data valid, API akan mengosongkan `user_id` dan `lahan_id` berdasarkan `iot_id`, dan mengembalikan response sukses.
+
+### Response
+API akan mengembalikan respon dengan format berikut:
+```json
+{
+  "error": "boolean",
+  "message": "string"
+}
+```
+
+### Contoh Request dan Response
+
+#### Request
+Headers:
+- Content-Type: application/json
+
+Body:
+```json
+{
+  "id": "iot123"
+}
+```
+
+#### Response (Success)
+```json
+{
+  "error": false,
+  "message": "Pendaftaran IOT berhasil direset"
+}
+```
+
+#### Response (IOT Tidak Ditemukan)
+```json
+{
+  "error": true,
+  "message": "IOT tidak ditemukan"
 }
 ```
