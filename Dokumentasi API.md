@@ -1684,3 +1684,171 @@ Body:
   "message": "IOT tidak ditemukan"
 }
 ```
+
+
+
+---
+
+## Rekomendasi Tanam Berdasarkan Gambar Tanah
+
+### Endpoint
+```
+POST /tanam/rekomendasi/gambar
+```
+
+### Deskripsi
+API ini digunakan untuk mendapatkan rekomendasi bibit berdasarkan gambar tanah yang dikirim sebagai Base64.
+
+### Headers
+- Content-Type: application/json
+- Authorization: Bearer {token}
+
+### Body
+```json
+{
+  "image": "string (Base64)"
+}
+```
+
+### Logic
+1. API akan memvalidasi data yang dikirimkan.
+    - Jika `image` tidak ada atau bukan Base64, API akan mengembalikan response error.
+    - Jika data valid, API akan menganalisis gambar menggunakan model machine learning, dan mengembalikan rekomendasi bibit.
+
+### Response
+API akan mengembalikan respon dengan format berikut:
+```json
+{
+  "error": "boolean",
+  "message": "string",
+  "data": {
+    "bibit": "array"
+  }
+}
+```
+
+### Contoh Request dan Response
+
+#### Request
+Headers:
+- Content-Type: application/json
+- Authorization: Bearer xyz987
+
+Body:
+```json
+{
+  "image": "data:image/jpeg;base64,..."
+}
+```
+
+#### Response (Success)
+```json
+{
+  "error": false,
+  "message": "Berhasil mendapatkan rekomendasi bibit",
+  "data": {
+    "bibit": [
+      {
+        "id": "bibit123",
+        "nama": "Bibit Tomat",
+        "photo": "url",
+        "deskripsi": "Deskripsi bibit",
+        "harga_beli": 10000,
+        "jenis": "Sayuran",
+        "link_market": "url"
+      },
+      //...
+    ]
+  }
+}
+```
+
+#### Response (Data Tidak Valid)
+```json
+{
+  "error": true,
+  "message": "Data tidak valid"
+}
+```
+
+---
+
+## Rekomendasi Tanam Berdasarkan Hasil IOT
+
+### Endpoint
+```
+POST /tanam/rekomendasi/iot
+```
+
+### Deskripsi
+API ini digunakan untuk mendapatkan rekomendasi bibit berdasarkan hasil IOT.
+
+### Headers
+- Content-Type: application/json
+
+### Body
+```json
+{
+  "iot_id": "string"
+}
+```
+
+### Logic
+1. API akan memvalidasi data yang dikirimkan.
+    - Jika `iot_id` tidak ditemukan dalam database, API akan mengembalikan response error.
+    - Jika data valid, API akan menghitung rata-rata hasil IOT dalam 1 minggu terakhir berdasarkan `iot_id`, mengirimkan datanya ke model machine learning, dan mengembalikan rekomendasi bibit.
+
+### Response
+API akan mengembalikan respon dengan format berikut:
+```json
+{
+  "error": "boolean",
+  "message": "string",
+  "data": {
+    "bibit": "array"
+  }
+}
+```
+
+### Contoh Request dan Response
+
+#### Request
+Headers:
+- Content-Type: application/json
+
+Body:
+```json
+{
+  "iot_id": "iot123"
+}
+```
+
+#### Response (Success)
+```json
+{
+  "error": false,
+  "message": "Berhasil mendapatkan rekomendasi bibit",
+  "data": {
+    "bibit": [
+      {
+        "id": "bibit123",
+        "nama": "Bibit Tomat",
+        "photo": "url",
+        "deskripsi": "Deskripsi bibit",
+        "harga_beli": 10000,
+        "jenis": "Sayuran",
+        "link_market": "url"
+      },
+      //...
+    ]
+  }
+}
+```
+
+#### Response (IOT Tidak Ditemukan)
+```json
+{
+  "error": true,
+  "message": "IOT tidak ditemukan"
+}
+```
